@@ -1,64 +1,81 @@
 package ru.alexsumin.weatherbot.bot;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Update;
-import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
-import ru.alexsumin.weatherbot.repositories.UserRepository;
+import ru.alexsumin.weatherbot.handler.MessageHandler;
+import ru.alexsumin.weatherbot.handler.MessageHandlerImpl;
+import ru.alexsumin.weatherbot.service.CityService;
+import ru.alexsumin.weatherbot.service.SubscriptionService;
+import ru.alexsumin.weatherbot.service.UserService;
+import ru.alexsumin.weatherbot.service.WeatherService;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.annotation.PostConstruct;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Component
 public class Bot extends TelegramLongPollingBot {
 
-    private UserRepository userRepository;
+    private ExecutorService executorService;
+
+    private UserService userService;
+    private WeatherService weatherService;
+    private SubscriptionService subscriptionService;
+    private CityService cityService;
+
     @Value("${bot.token}")
     private String token;
     @Value("${bot.username}")
     private String username;
 
-    @Autowired
-    public Bot(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public Bot(UserService userService, WeatherService weatherService,
+               SubscriptionService subscriptionService, CityService cityService) {
+        this.userService = userService;
+        this.weatherService = weatherService;
+        this.subscriptionService = subscriptionService;
+        this.cityService = cityService;
+    }
+
+    @PostConstruct
+    private void init() {
+        executorService = Executors.newSingleThreadExecutor();
     }
 
     public void onUpdateReceived(Update update) {
-
         if (update.hasMessage() && update.getMessage().hasText()) {
-            String message_text = update.getMessage().getText();
-            long chat_id = update.getMessage().getChatId();
 
-            SendMessage message = new SendMessage() // Create a message object object
-                    .setChatId(chat_id)
-                    .setText("Меню");
 
-            ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-            List<KeyboardRow> keyboard = new ArrayList<>();
+            MessageHandler handler
+                    = new MessageHandlerImpl(update.getMessage(), userService,
+                    weatherService, subscriptionService, cityService);
 
-            KeyboardRow row = new KeyboardRow();
-            row.add("Информация");
-            row.add("Прогноз на сегодня");
-            row.add("Уведомления");
+            CompletableFuture.supplyAsync(() -> {
+                try {
+                    return handler.call();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }, executorService)
+                    .thenAcceptAsync(this::sendResponse, executorService)
+                    .exceptionally(throwable -> {
+                        System.out.println(throwable.getMessage());
+                        return null;
+                    });
 
-            keyboard.add(row);
-            row = new KeyboardRow();
-            row.add("Настройки");
-            keyboard.add(row);
+        }
 
-            keyboardMarkup.setKeyboard(keyboard);
+    }
 
-            message.setReplyMarkup(keyboardMarkup);
-            try {
-                execute(message); // Sending our message object to user
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
+    private synchronized void sendResponse(SendMessage response) {
+        try {
+            execute(response);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
         }
 
     }

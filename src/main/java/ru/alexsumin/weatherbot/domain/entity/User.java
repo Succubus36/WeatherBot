@@ -1,4 +1,6 @@
-package ru.alexsumin.weatherbot.domain;
+package ru.alexsumin.weatherbot.domain.entity;
+
+import ru.alexsumin.weatherbot.domain.CurrentMenu;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -13,8 +15,10 @@ public class User {
     private Long id;
 
     @OneToOne
+    @JoinColumn(name = "subscription_id")
     private Subscription subscription;
 
+    @Column(name = "current_menu")
     @Enumerated(value = EnumType.STRING)
     private CurrentMenu currentMenu;
 
@@ -23,6 +27,7 @@ public class User {
 
     public User(@NotNull Long id) {
         this.id = id;
+        this.currentMenu = CurrentMenu.START;
     }
 
     public Long getId() {
@@ -48,4 +53,5 @@ public class User {
     public void setCurrentMenu(CurrentMenu currentMenu) {
         this.currentMenu = currentMenu;
     }
+
 }

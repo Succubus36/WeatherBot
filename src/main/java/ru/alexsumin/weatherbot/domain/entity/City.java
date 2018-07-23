@@ -1,4 +1,4 @@
-package ru.alexsumin.weatherbot.domain;
+package ru.alexsumin.weatherbot.domain.entity;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -18,6 +18,10 @@ public class City {
     private Set<Subscription> subscriptions = new HashSet<>();
 
     public City() {
+    }
+
+    public City(String name) {
+        this.name = name;
     }
 
     public Long getId() {
