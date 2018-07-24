@@ -21,13 +21,17 @@ public class WeatherState {
     @Column(name = "timestamp")
     private long timestamp;
 
+    @Column(name = "city")
+    private String city;
+
     @Enumerated(value = EnumType.STRING)
     private WeatherStatus weatherStatus;
 
     public WeatherState() {
     }
 
-    public WeatherState(WeatherStatus weatherStatus) {
+    public WeatherState(String city, WeatherStatus weatherStatus) {
+        this.city = city;
         this.weatherStatus = weatherStatus;
         this.timestamp = new Date().getTime();
     }
@@ -62,5 +66,13 @@ public class WeatherState {
 
     public void setWeatherStatus(WeatherStatus weatherStatus) {
         this.weatherStatus = weatherStatus;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

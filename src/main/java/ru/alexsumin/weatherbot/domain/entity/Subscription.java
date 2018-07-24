@@ -10,19 +10,15 @@ public class Subscription {
     @Column(name = "subscription_id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "time_of_notification")
-    private Integer timeOfNotification;
+    @Column(name = "time_to_alert")
+    private Integer timeToAlert;
 
     @Column(name = "is_active")
     private Boolean isActive;
-
-    @ManyToOne
-    @JoinColumn(name = "city_id")
-    private City city;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "weather_state_id")
@@ -31,9 +27,9 @@ public class Subscription {
     public Subscription() {
     }
 
-    public Subscription(User user, City city) {
+    public Subscription(User user, WeatherState weatherState) {
         this.user = user;
-        this.city = city;
+        this.weatherState = weatherState;
     }
 
     public Long getId() {
@@ -44,14 +40,6 @@ public class Subscription {
         this.id = id;
     }
 
-    public City getCity() {
-        return city;
-    }
-
-    public void setCity(City city) {
-        this.city = city;
-    }
-
     public User getUser() {
         return user;
     }
@@ -60,12 +48,12 @@ public class Subscription {
         this.user = user;
     }
 
-    public Integer getTimeOfNotification() {
-        return timeOfNotification;
+    public Integer getTimeToAlert() {
+        return timeToAlert;
     }
 
-    public void setTimeOfNotification(Integer timeOfNotification) {
-        this.timeOfNotification = timeOfNotification;
+    public void setTimeToAlert(Integer timeToAlert) {
+        this.timeToAlert = timeToAlert;
     }
 
     public Boolean getActive() {

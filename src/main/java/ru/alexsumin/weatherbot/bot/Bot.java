@@ -8,10 +8,9 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.alexsumin.weatherbot.handler.MessageHandler;
 import ru.alexsumin.weatherbot.handler.MessageHandlerImpl;
-import ru.alexsumin.weatherbot.service.CityService;
 import ru.alexsumin.weatherbot.service.SubscriptionService;
 import ru.alexsumin.weatherbot.service.UserService;
-import ru.alexsumin.weatherbot.service.WeatherService;
+import ru.alexsumin.weatherbot.service.WeatherStateService;
 
 import javax.annotation.PostConstruct;
 import java.util.concurrent.CompletableFuture;
@@ -24,21 +23,20 @@ public class Bot extends TelegramLongPollingBot {
     private ExecutorService executorService;
 
     private UserService userService;
-    private WeatherService weatherService;
+    private WeatherStateService weatherStateService;
     private SubscriptionService subscriptionService;
-    private CityService cityService;
+
 
     @Value("${bot.token}")
     private String token;
     @Value("${bot.username}")
     private String username;
 
-    public Bot(UserService userService, WeatherService weatherService,
-               SubscriptionService subscriptionService, CityService cityService) {
+    public Bot(UserService userService,
+               WeatherStateService weatherStateService, SubscriptionService subscriptionService) {
         this.userService = userService;
-        this.weatherService = weatherService;
+        this.weatherStateService = weatherStateService;
         this.subscriptionService = subscriptionService;
-        this.cityService = cityService;
     }
 
     @PostConstruct
@@ -52,7 +50,7 @@ public class Bot extends TelegramLongPollingBot {
 
             MessageHandler handler
                     = new MessageHandlerImpl(update.getMessage(), userService,
-                    weatherService, subscriptionService, cityService);
+                    weatherStateService, subscriptionService);
 
             CompletableFuture.supplyAsync(() -> {
                 try {
