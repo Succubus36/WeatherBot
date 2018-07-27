@@ -1,5 +1,7 @@
 package ru.alexsumin.weatherbot.domain.entity;
 
+import ru.alexsumin.weatherbot.domain.WeatherStatus;
+
 import javax.persistence.*;
 
 @Entity
@@ -10,7 +12,7 @@ public class Subscription {
     @Column(name = "subscription_id")
     private Long id;
 
-    @OneToOne(cascade = CascadeType.MERGE)
+    @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -20,16 +22,23 @@ public class Subscription {
     @Column(name = "is_active")
     private Boolean isActive;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "weather_state_id")
-    private WeatherState weatherState;
+    @Column(name = "timestamp")
+    private long timestamp;
+
+    @Column(name = "city")
+    private String city;
+
+    @Enumerated(value = EnumType.STRING)
+    private WeatherStatus weatherStatus;
+
 
     public Subscription() {
     }
 
-    public Subscription(User user, WeatherState weatherState) {
+    public Subscription(User user, WeatherStatus weatherStatus, String city) {
         this.user = user;
-        this.weatherState = weatherState;
+        this.weatherStatus = weatherStatus;
+        this.city = city;
     }
 
     public Long getId() {
@@ -64,11 +73,27 @@ public class Subscription {
         isActive = active;
     }
 
-    public WeatherState getWeatherState() {
-        return weatherState;
+    public long getTimestamp() {
+        return timestamp;
     }
 
-    public void setWeatherState(WeatherState weatherState) {
-        this.weatherState = weatherState;
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public WeatherStatus getWeatherStatus() {
+        return weatherStatus;
+    }
+
+    public void setWeatherStatus(WeatherStatus weatherStatus) {
+        this.weatherStatus = weatherStatus;
     }
 }

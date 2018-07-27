@@ -1,11 +1,13 @@
 package ru.alexsumin.weatherbot.service;
 
+import net.aksingh.owmjapis.model.param.WeatherData;
 import ru.alexsumin.weatherbot.domain.WeatherStatus;
-import ru.alexsumin.weatherbot.domain.entity.WeatherState;
+
+import java.util.List;
 
 public interface WeatherService {
 
-    WeatherState findWeatherByCity(String cityName);
+    List<WeatherData> getForecastByCity(String city);
 
     WeatherStatus getCurrentWeatherStatus(String cityName) throws Exception;
 }

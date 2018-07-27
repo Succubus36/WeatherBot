@@ -10,7 +10,7 @@ import ru.alexsumin.weatherbot.handler.MessageHandler;
 import ru.alexsumin.weatherbot.handler.MessageHandlerImpl;
 import ru.alexsumin.weatherbot.service.SubscriptionService;
 import ru.alexsumin.weatherbot.service.UserService;
-import ru.alexsumin.weatherbot.service.WeatherStateService;
+import ru.alexsumin.weatherbot.service.WeatherService;
 
 import javax.annotation.PostConstruct;
 import java.util.concurrent.CompletableFuture;
@@ -23,7 +23,7 @@ public class Bot extends TelegramLongPollingBot {
     private ExecutorService executorService;
 
     private UserService userService;
-    private WeatherStateService weatherStateService;
+    private WeatherService weatherService;
     private SubscriptionService subscriptionService;
 
 
@@ -33,9 +33,9 @@ public class Bot extends TelegramLongPollingBot {
     private String username;
 
     public Bot(UserService userService,
-               WeatherStateService weatherStateService, SubscriptionService subscriptionService) {
+               WeatherService weatherService, SubscriptionService subscriptionService) {
         this.userService = userService;
-        this.weatherStateService = weatherStateService;
+        this.weatherService = weatherService;
         this.subscriptionService = subscriptionService;
     }
 
@@ -50,7 +50,7 @@ public class Bot extends TelegramLongPollingBot {
 
             MessageHandler handler
                     = new MessageHandlerImpl(update.getMessage(), userService,
-                    weatherStateService, subscriptionService);
+                    weatherService, subscriptionService);
 
             CompletableFuture.supplyAsync(() -> {
                 try {
@@ -69,7 +69,7 @@ public class Bot extends TelegramLongPollingBot {
 
     }
 
-    private synchronized void sendResponse(SendMessage response) {
+    public synchronized void sendResponse(SendMessage response) {
         try {
             execute(response);
         } catch (TelegramApiException e) {

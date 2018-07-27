@@ -6,10 +6,9 @@ import ru.alexsumin.weatherbot.domain.CurrentMenu;
 import ru.alexsumin.weatherbot.domain.WeatherStatus;
 import ru.alexsumin.weatherbot.domain.entity.Subscription;
 import ru.alexsumin.weatherbot.domain.entity.User;
-import ru.alexsumin.weatherbot.domain.entity.WeatherState;
 import ru.alexsumin.weatherbot.service.SubscriptionService;
 import ru.alexsumin.weatherbot.service.UserService;
-import ru.alexsumin.weatherbot.service.WeatherStateService;
+import ru.alexsumin.weatherbot.service.WeatherService;
 
 public class MessageHandlerImpl extends MessageHandler {
 
@@ -17,18 +16,18 @@ public class MessageHandlerImpl extends MessageHandler {
     private static final String HELLO = "Привет! Красивое приветствие." +
             "А сейчас небольшое интервью.\n" +
             "Впиши свой город:";
-    private static final String UNKNOWN_CITY = "Не могу найти город, попробуй ещё раз";
+    private static final String UNKNOWN_CITY = "Не удалось определить город, попробуй ещё раз";
     private static final String WRONG_HOURS = "Количество часов должно быть от 1 до 24! Попробуй еще раз";
     private final Message message;
     private UserService userService;
-    private WeatherStateService weatherStateService;
+    private WeatherService weatherService;
     private SubscriptionService subscriptionService;
 
     public MessageHandlerImpl(Message message, UserService userService,
-                              WeatherStateService weatherStateService, SubscriptionService subscriptionService) {
+                              WeatherService weatherService, SubscriptionService subscriptionService) {
         this.message = message;
         this.userService = userService;
-        this.weatherStateService = weatherStateService;
+        this.weatherService = weatherService;
         this.subscriptionService = subscriptionService;
     }
 
@@ -45,11 +44,10 @@ public class MessageHandlerImpl extends MessageHandler {
             case START_CITY: {
                 String cityName = message.getText();
                 try {
-                    WeatherStatus weatherStatus = weatherStateService.getCurrentWeatherStatus(cityName);
-                    WeatherState state = new WeatherState(cityName, weatherStatus);
+                    WeatherStatus weatherStatus = weatherService.getCurrentWeatherStatus(cityName);
 
-                    Subscription subscription = new Subscription(user, state);
-                    state.setSubscription(subscription);
+                    Subscription subscription = new Subscription(user, weatherStatus, cityName);
+
                     subscriptionService.save(subscription);
 
                     user.setSubscription(subscription);
