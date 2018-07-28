@@ -39,6 +39,7 @@ public class Subscription {
         this.user = user;
         this.weatherStatus = weatherStatus;
         this.city = city;
+        this.isActive = false;
     }
 
     public Long getId() {

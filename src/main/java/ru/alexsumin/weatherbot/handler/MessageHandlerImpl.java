@@ -10,6 +10,8 @@ import ru.alexsumin.weatherbot.service.SubscriptionService;
 import ru.alexsumin.weatherbot.service.UserService;
 import ru.alexsumin.weatherbot.service.WeatherService;
 
+import java.util.Date;
+
 public class MessageHandlerImpl extends MessageHandler {
 
     private static final String HOURS_QUESTION = "Отлично! Теперь скажи за сколько часов тебе присылать сообщения об изменении погоды?";
@@ -18,6 +20,7 @@ public class MessageHandlerImpl extends MessageHandler {
             "Впиши свой город:";
     private static final String UNKNOWN_CITY = "Не удалось определить город, попробуй ещё раз";
     private static final String WRONG_HOURS = "Количество часов должно быть от 1 до 24! Попробуй еще раз";
+    private static final String INFO = "Тут небольшая справка";
     private final Message message;
     private UserService userService;
     private WeatherService weatherService;
@@ -47,7 +50,7 @@ public class MessageHandlerImpl extends MessageHandler {
                     WeatherStatus weatherStatus = weatherService.getCurrentWeatherStatus(cityName);
 
                     Subscription subscription = new Subscription(user, weatherStatus, cityName);
-
+                    subscription.setTimestamp(new Date().getTime());
                     subscriptionService.save(subscription);
 
                     user.setSubscription(subscription);
@@ -78,6 +81,18 @@ public class MessageHandlerImpl extends MessageHandler {
                 }
             }
             case MENU:
+                String text = message.getText();
+                switch (text) {
+                    case "Информация":
+                        return new SendMessage(chatId, INFO);
+                    case "Погода сейчас":
+
+                    case "Уведомления":
+
+                    case "Настройки":
+//                        default:
+//                            return new SendMessage(chatId, "Не понял, попробуй ещё раз");
+                }
                 return new SendMessage(chatId, "Тут будет меню");
             default:
                 return new SendMessage(chatId, "Не понял, попробуй ещё раз");

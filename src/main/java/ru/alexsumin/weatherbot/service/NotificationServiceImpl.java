@@ -1,10 +1,12 @@
 package ru.alexsumin.weatherbot.service;
 
 import net.aksingh.owmjapis.model.param.WeatherData;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import ru.alexsumin.weatherbot.bot.Bot;
+import ru.alexsumin.weatherbot.domain.CancelNotificationEvent;
 import ru.alexsumin.weatherbot.domain.NotificationMessage;
 import ru.alexsumin.weatherbot.domain.WeatherStatus;
 import ru.alexsumin.weatherbot.domain.entity.Subscription;
@@ -24,7 +26,7 @@ public class NotificationServiceImpl implements NotificationService {
     private WeatherService weatherService;
     private SubscriptionService subscriptionService;
 
-    private Map<Long, ScheduledFuture> scheduledTasks = new HashMap<>();
+    private Map<Long, ScheduledFuture> scheduledTasks;
     private List<Subscription> activeSubscriptions;
     private ScheduledExecutorService execService;
 
@@ -38,17 +40,24 @@ public class NotificationServiceImpl implements NotificationService {
     @PostConstruct
     private void bootstrap() {
         updateSubscriptions();
+        scheduledTasks = new HashMap<>();
         execService = Executors.newScheduledThreadPool(5);
     }
 
-    private void cancelNotification(Long chatId) {
-        ScheduledFuture<?> forCancel = scheduledTasks.remove(chatId);
-        forCancel.cancel(true);
+    @EventListener
+    private void cancelNotification(CancelNotificationEvent event) {
+        System.out.println("отменить нотификацию");
+        Long keyForCancel = event.getChatId();
+        if (scheduledTasks.containsKey(keyForCancel)) {
+            ScheduledFuture<?> forCancel = scheduledTasks.remove(event.getChatId());
+            forCancel.cancel(true);
+        }
+
     }
 
     private void updateSubscriptions() {
         activeSubscriptions = subscriptionService.getActiveSubscriptions();
-        if (activeSubscriptions != null) {
+        if (!activeSubscriptions.isEmpty()) {
             Set<String> cities = new HashSet<>();
             activeSubscriptions.forEach(subscription -> cities.add(subscription.getCity()));
         }
@@ -99,4 +108,5 @@ public class NotificationServiceImpl implements NotificationService {
             }
         });
     }
+
 }
