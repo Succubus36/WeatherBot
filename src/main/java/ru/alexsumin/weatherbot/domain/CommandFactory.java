@@ -32,7 +32,7 @@ public class CommandFactory {
             case START_NOTIFICATIONS:
                 return new StartNotificationsCommand(message, userService, subscriptionService);
             case MENU:
-                return new MenuCommand(message, userService, subscriptionService, weatherService);
+                return new MenuCommand(message, userService, weatherService);
             case SETTINGS:
                 return new SettingsCommand(message, userService);
             case NOTIFICATIONS:

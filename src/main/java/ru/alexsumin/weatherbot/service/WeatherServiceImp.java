@@ -6,7 +6,6 @@ import net.aksingh.owmjapis.model.CurrentWeather;
 import net.aksingh.owmjapis.model.HourlyWeatherForecast;
 import net.aksingh.owmjapis.model.param.WeatherData;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionalEventListener;
