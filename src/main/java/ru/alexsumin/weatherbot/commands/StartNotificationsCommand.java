@@ -8,6 +8,7 @@ import ru.alexsumin.weatherbot.domain.entity.User;
 import ru.alexsumin.weatherbot.domain.ReplyKeyboardBuilder;
 import ru.alexsumin.weatherbot.service.SubscriptionService;
 import ru.alexsumin.weatherbot.service.UserService;
+import ru.alexsumin.weatherbot.util.NumberUtil;
 
 public class StartNotificationsCommand  extends Command {
 
@@ -30,8 +31,9 @@ public class StartNotificationsCommand  extends Command {
         User user = userService.findById(chatId);
         try {
             int hours = Integer.parseInt(message.getText());
-            if (!((hours > 0) & (hours <= 24)))
+            if (NumberUtil.isInTheRangeFromOneToTwentyFour(hours)) {
                 return new SendMessage(chatId, WRONG_HOURS);
+            }
 
             Subscription subscription = user.getSubscription();
             subscription.setTimeToAlert(hours);
@@ -40,7 +42,8 @@ public class StartNotificationsCommand  extends Command {
             user.setCurrentMenu(CurrentMenu.MENU);
             userService.save(user);
             return ReplyKeyboardBuilder.create(chatId)
-                    .setText("Отлично!\nМеню:")
+                    .setText("Отлично! Буду присылать уведомления за " +
+                            hours + " " + NumberUtil.getFormattedHours(hours) + ".\nМеню:")
                     .row()
                     .button("Информация")
                     .button("Погода сейчас")

@@ -19,10 +19,9 @@ import java.util.concurrent.*;
 @Service
 public class NotificationServiceImpl implements NotificationService {
 
-
-    private Bot bot;
-    private WeatherService weatherService;
-    private SubscriptionService subscriptionService;
+    private final Bot bot;
+    private final WeatherService weatherService;
+    private final SubscriptionService subscriptionService;
 
     private Map<Long, ScheduledFuture> scheduledTasks;
     private List<Subscription> activeSubscriptions;
@@ -61,7 +60,7 @@ public class NotificationServiceImpl implements NotificationService {
         }
     }
 
-    private void createNotification(Long chatId, NotificationMessage notification, long delay) {
+    public void createNotification(Long chatId, NotificationMessage notification, long delay) {
         scheduledTasks.remove(chatId);
         Runnable notificationTask = () -> {
             SendMessage message = new SendMessage(chatId, notification.getMessage());
@@ -75,14 +74,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Scheduled(cron = "0 0/4 * * * *")
     public void everyHoursForecastCheck() {
         System.out.println("every hour task!!!");
-
-        //List<Subscription> subscriptions = subscriptionService.getActiveSubscriptions();
         activeSubscriptions = subscriptionService.getActiveSubscriptions();
-
-        for (Subscription s : activeSubscriptions) {
-            System.out.println(s);
-        }
-
         activeSubscriptions.forEach(subscription -> {
 
             String city = subscription.getCity();

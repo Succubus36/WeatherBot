@@ -14,7 +14,7 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "subscription_id")
     private Subscription subscription;
 
