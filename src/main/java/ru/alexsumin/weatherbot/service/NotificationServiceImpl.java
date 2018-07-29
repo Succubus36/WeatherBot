@@ -4,6 +4,7 @@ import net.aksingh.owmjapis.model.param.WeatherData;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import ru.alexsumin.weatherbot.bot.Bot;
 import ru.alexsumin.weatherbot.domain.CancelNotificationEvent;
@@ -13,10 +14,7 @@ import ru.alexsumin.weatherbot.domain.entity.Subscription;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 @Service
 public class NotificationServiceImpl implements NotificationService {
@@ -40,11 +38,12 @@ public class NotificationServiceImpl implements NotificationService {
     @PostConstruct
     private void bootstrap() {
         updateSubscriptions();
-        scheduledTasks = new HashMap<>();
-        execService = Executors.newScheduledThreadPool(5);
+        scheduledTasks = new ConcurrentHashMap<>();
+        execService = Executors.newSingleThreadScheduledExecutor();
     }
 
-    @EventListener
+
+    @TransactionalEventListener
     private void cancelNotification(CancelNotificationEvent event) {
         System.out.println("отменить нотификацию");
         Long keyForCancel = event.getChatId();
@@ -52,7 +51,6 @@ public class NotificationServiceImpl implements NotificationService {
             ScheduledFuture<?> forCancel = scheduledTasks.remove(event.getChatId());
             forCancel.cancel(true);
         }
-
     }
 
     private void updateSubscriptions() {
@@ -73,13 +71,19 @@ public class NotificationServiceImpl implements NotificationService {
         scheduledTasks.put(chatId, scheduledFuture);
     }
 
-    @Scheduled(cron = "0 0 * * * *")
-    public void everyHourTaskTest() {
+    //@Scheduled(cron = "0 0 * * * *")
+    @Scheduled(cron = "0 0/4 * * * *")
+    public void everyHoursForecastCheck() {
         System.out.println("every hour task!!!");
 
-        List<Subscription> subscriptions = subscriptionService.getActiveSubscriptions();
+        //List<Subscription> subscriptions = subscriptionService.getActiveSubscriptions();
+        activeSubscriptions = subscriptionService.getActiveSubscriptions();
 
-        subscriptions.forEach(subscription -> {
+        for (Subscription s : activeSubscriptions) {
+            System.out.println(s);
+        }
+
+        activeSubscriptions.forEach(subscription -> {
 
             String city = subscription.getCity();
             long lastupdated = subscription.getTimestamp();

@@ -2,6 +2,7 @@ package ru.alexsumin.weatherbot.service;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.alexsumin.weatherbot.domain.CancelNotificationEvent;
 import ru.alexsumin.weatherbot.domain.NewCityEvent;
 import ru.alexsumin.weatherbot.domain.entity.Subscription;
@@ -22,15 +23,16 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
+    @Transactional
     public Subscription save(Subscription subscription) {
 
         if (subscription.getActive() & (subscription.getCity() != null))
-            publisher.publishEvent(new NewCityEvent(this, subscription.getCity()));
+            publisher.publishEvent(new NewCityEvent(subscription.getCity()));
 
         if (subscription.getId() != null) {
             Subscription old = subscriptionRepository.findById(subscription.getId()).get();
             if ((old.getActive()) & (!subscription.getActive()))
-                publisher.publishEvent(new CancelNotificationEvent(this, subscription.getUser().getId()));
+                publisher.publishEvent(new CancelNotificationEvent(subscription.getUser().getId()));
         }
         return subscriptionRepository.save(subscription);
     }

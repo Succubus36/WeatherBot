@@ -1,13 +1,10 @@
 package ru.alexsumin.weatherbot.domain;
 
-import org.springframework.context.ApplicationEvent;
-
-public class CancelNotificationEvent extends ApplicationEvent {
+public class CancelNotificationEvent {
 
     private Long chatId;
 
-    public CancelNotificationEvent(Object source, Long chatId) {
-        super(source);
+    public CancelNotificationEvent(Long chatId) {
         this.chatId = chatId;
     }
 

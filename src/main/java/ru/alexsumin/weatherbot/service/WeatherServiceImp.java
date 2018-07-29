@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionalEventListener;
 import ru.alexsumin.weatherbot.domain.NewCityEvent;
 import ru.alexsumin.weatherbot.domain.WeatherStatus;
 import ru.alexsumin.weatherbot.domain.entity.Subscription;
@@ -23,6 +24,7 @@ public class WeatherServiceImp implements WeatherService {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
     private final SubscriptionService subscriptionService;
+
     private Set<String> cities;
     private Map<String, List<WeatherData>> forecasts;
 
@@ -37,20 +39,26 @@ public class WeatherServiceImp implements WeatherService {
     @PostConstruct
     private void init() {
         updateCities();
+        updateForecast();
     }
 
     private void updateCities() {
+        System.out.println("обновляю список городов");
         cities = new HashSet<>();
         List<Subscription> subscriptions = subscriptionService.getActiveSubscriptions();
-        if (!subscriptions.isEmpty())
-            subscriptions.forEach(subscription -> cities.add(subscription.getCity()));
+        if (!subscriptions.isEmpty()) {
+            subscriptions.forEach(subscription -> {
+                System.out.println("добавил город: " + subscription.getCity());
+                cities.add(subscription.getCity());
+            });
+        }
     }
 
-    @EventListener
+    @TransactionalEventListener
     private void addNewCity(NewCityEvent event) {
         System.out.println("new city event!!");
         String newCity = event.getCity();
-        if (!cities.contains(newCity)){
+        if (!cities.contains(newCity)) {
             updateCities();
             updateForecast();
         }
@@ -66,11 +74,11 @@ public class WeatherServiceImp implements WeatherService {
         return WeatherStatus.getStatus(cw.getWeatherList().get(0).getMainInfo());
     }
 
-    private void updateForecast(){
+    private void updateForecast() {
         OWM owm = new OWM(key);
         Map<String, List<WeatherData>> forecastTemp = new HashMap<>();
         boolean isSuccessUpdate = true;
-        if (!cities.isEmpty())
+        if (!cities.isEmpty()) {
             for (String s : cities) {
                 try {
                     HourlyWeatherForecast forecast = owm.hourlyWeatherForecastByCityName(s);
@@ -81,14 +89,15 @@ public class WeatherServiceImp implements WeatherService {
                     System.out.println("проблема с обновлением");
                 }
             }
+        }
         if (isSuccessUpdate) forecasts = forecastTemp;
+        System.out.println("обновил прогноз!");
     }
 
-    //@Scheduled(cron = "0 0 0,12 * * *")
-    @Scheduled(cron = "0 0/5 * * * *")
-    public void twiceInDayUpdate() {
+    @Scheduled(cron = "0 1 0/3 * * *")
+    public void everyThreeHoursUpdate() {
         System.out.println(dateFormat.format(new Date(System.currentTimeMillis())));
-        System.out.println("every 12 hours task!!!");
+        System.out.println("every 3 hours task!!!");
         updateForecast();
     }
 }

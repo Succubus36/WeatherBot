@@ -2,12 +2,11 @@ package ru.alexsumin.weatherbot.domain;
 
 import org.springframework.context.ApplicationEvent;
 
-public class NewCityEvent extends ApplicationEvent {
+public class NewCityEvent {
 
     private String city;
 
-    public NewCityEvent(Object source, String city) {
-        super(source);
+    public NewCityEvent(String city) {
         this.city = city;
     }
 

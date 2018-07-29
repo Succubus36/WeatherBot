@@ -97,4 +97,16 @@ public class Subscription {
     public void setWeatherStatus(WeatherStatus weatherStatus) {
         this.weatherStatus = weatherStatus;
     }
+
+    @Override
+    public String toString() {
+        return "Subscription{" +
+                "id=" + id +
+                ", timeToAlert=" + timeToAlert +
+                ", isActive=" + isActive +
+                ", timestamp=" + timestamp +
+                ", city='" + city + '\'' +
+                ", weatherStatus=" + weatherStatus +
+                '}';
+    }
 }
