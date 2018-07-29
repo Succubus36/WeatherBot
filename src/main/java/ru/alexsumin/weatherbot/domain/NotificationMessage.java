@@ -14,7 +14,7 @@ public class NotificationMessage {
     public String getMessage() {
         return new StringBuilder("Через ").append(hours)
                 .append(" ").append(getFormattedHours()).append(" ожидается изменение погоды на ")
-                .append(getTranslatedWeather()).append(".").toString();
+                .append(WeatherStatus.getTranslatedOnRuWeather(status)).append(".").toString();
     }
 
     private String getFormattedHours() {
@@ -34,23 +34,5 @@ public class NotificationMessage {
         }
     }
 
-    private String getTranslatedWeather() {
-        switch (status) {
-            case THUNDERSTORM:
-                return "\"шторм\"";
-            case DRIZZLE:
-                return "\"изморось\"";
-            case RAIN:
-                return "\"дождь\"";
-            case SNOW:
-                return "\"снег\"";
-            case ATMOSPHERE:
-                return "\"атмосферное явление\"";
-            case CLEAR:
-                return "\"ясно\"";
-            case CLOUDS:
-                return "\"облачно\"";
-        }
-        throw new IllegalArgumentException();
-    }
+
 }

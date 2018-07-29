@@ -5,5 +5,7 @@ public enum CurrentMenu {
     START_CITY,
     START_NOTIFICATIONS,
     MENU,
-    NOTIFICATIONS
+    NOTIFICATIONS,
+    SETTINGS,
+    CHANGE_CITY
 }
