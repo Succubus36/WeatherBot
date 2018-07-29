@@ -1,7 +1,5 @@
 package ru.alexsumin.weatherbot.domain;
 
-import org.springframework.context.ApplicationEvent;
-
 public class NewCityEvent {
 
     private String city;
