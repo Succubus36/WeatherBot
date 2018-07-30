@@ -1,7 +1,8 @@
 package ru.alexsumin.weatherbot.commands;
 
-import net.aksingh.owmjapis.api.APIException;
+import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.Message;
 import ru.alexsumin.weatherbot.domain.CurrentMenu;
 import ru.alexsumin.weatherbot.domain.WeatherStatus;
 import ru.alexsumin.weatherbot.domain.entity.Subscription;
@@ -9,10 +10,9 @@ import ru.alexsumin.weatherbot.domain.entity.User;
 import ru.alexsumin.weatherbot.service.SubscriptionService;
 import ru.alexsumin.weatherbot.service.UserService;
 import ru.alexsumin.weatherbot.service.WeatherService;
-import org.telegram.telegrambots.api.objects.Message;
-
 import java.util.Date;
 
+@Slf4j
 public class StartCityCommand extends Command{
 
     private static final String HOURS_QUESTION = "Отлично! Теперь скажи за сколько часов тебе присылать сообщения об изменении погоды?";
@@ -51,7 +51,7 @@ public class StartCityCommand extends Command{
 
             return new SendMessage(chatId, HOURS_QUESTION);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             return new SendMessage(chatId, UNKNOWN_CITY);
         }
     }

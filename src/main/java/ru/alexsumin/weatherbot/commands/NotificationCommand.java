@@ -48,7 +48,7 @@ public class NotificationCommand extends Command {
             }
             case "Не присылать": {
                 Subscription subscription = user.getSubscription();
-                subscription.setActive(false);
+                subscription.setIsActive(false);
                 user.setCurrentMenu(CurrentMenu.MENU);
                 userService.save(user);
                 subscriptionService.save(subscription);
@@ -67,12 +67,13 @@ public class NotificationCommand extends Command {
             default:
                 try {
                     int hours = Integer.parseInt(text);
-                    if (!((hours > 0) & (hours <= 24)))
+                    if (!NumberUtil.isInTheRangeFromOneToTwentyFour(hours)) {
                         return new SendMessage(chatId, WRONG_HOURS);
+                    }
 
                     Subscription subscription = user.getSubscription();
                     subscription.setTimeToAlert(hours);
-                    subscription.setActive(true);
+                    subscription.setIsActive(true);
                     subscriptionService.save(subscription);
                     user.setCurrentMenu(CurrentMenu.MENU);
                     userService.save(user);

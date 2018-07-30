@@ -39,21 +39,21 @@ public class RepositoryIT {
         User user = new User(1L);
         userRepository.save(user);
         Subscription subscription = new Subscription(user, WeatherStatus.DRIZZLE, city1);
-        subscription.setActive(true);
+        subscription.setIsActive(true);
         subscription.setTimeToAlert(1);
         subscriptionRepository.save(subscription);
 
         User user2 = new User(2L);
         userRepository.save(user2);
         Subscription subscription2 = new Subscription(user2, WeatherStatus.DRIZZLE, city2);
-        subscription2.setActive(true);
+        subscription2.setIsActive(true);
         subscription2.setTimeToAlert(1);
         subscriptionRepository.save(subscription2);
 
         User user3 = new User(3L);
         userRepository.save(user3);
         Subscription subscription3 = new Subscription(user3, WeatherStatus.DRIZZLE, city3);
-        subscription3.setActive(false);
+        subscription3.setIsActive(false);
         subscription3.setTimeToAlert(1);
         subscriptionRepository.save(subscription3);
 

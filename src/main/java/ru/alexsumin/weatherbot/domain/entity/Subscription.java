@@ -1,9 +1,14 @@
 package ru.alexsumin.weatherbot.domain.entity;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import ru.alexsumin.weatherbot.domain.WeatherStatus;
 
 import javax.persistence.*;
-
+@Data
+@ToString(exclude = "user")
+@EqualsAndHashCode(exclude = "user")
 @Entity
 @Table(name = "subscription")
 public class Subscription {
@@ -40,73 +45,5 @@ public class Subscription {
         this.weatherStatus = weatherStatus;
         this.city = city;
         this.isActive = false;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Integer getTimeToAlert() {
-        return timeToAlert;
-    }
-
-    public void setTimeToAlert(Integer timeToAlert) {
-        this.timeToAlert = timeToAlert;
-    }
-
-    public Boolean getActive() {
-        return isActive;
-    }
-
-    public void setActive(Boolean active) {
-        isActive = active;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public WeatherStatus getWeatherStatus() {
-        return weatherStatus;
-    }
-
-    public void setWeatherStatus(WeatherStatus weatherStatus) {
-        this.weatherStatus = weatherStatus;
-    }
-
-    @Override
-    public String toString() {
-        return "Subscription{" +
-                "id=" + id +
-                ", timeToAlert=" + timeToAlert +
-                ", isActive=" + isActive +
-                ", timestamp=" + timestamp +
-                ", city='" + city + '\'' +
-                ", weatherStatus=" + weatherStatus +
-                '}';
     }
 }

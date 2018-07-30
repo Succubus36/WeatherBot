@@ -26,12 +26,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Transactional
     public Subscription save(Subscription subscription) {
 
-        if (subscription.getActive() & (subscription.getCity() != null))
+        if (subscription.getIsActive() & (subscription.getCity() != null))
             publisher.publishEvent(new NewCityEvent(subscription.getCity()));
 
         if (subscription.getId() != null) {
             Subscription old = subscriptionRepository.findById(subscription.getId()).get();
-            if ((old.getActive()) & (!subscription.getActive()))
+            if ((old.getIsActive()) & (!subscription.getIsActive()))
                 publisher.publishEvent(new CancelNotificationEvent(subscription.getUser().getId()));
         }
         return subscriptionRepository.save(subscription);

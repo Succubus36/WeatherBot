@@ -37,7 +37,7 @@ public class StartNotificationsCommand  extends Command {
 
             Subscription subscription = user.getSubscription();
             subscription.setTimeToAlert(hours);
-            subscription.setActive(true);
+            subscription.setIsActive(true);
             subscriptionService.save(subscription);
             user.setCurrentMenu(CurrentMenu.MENU);
             userService.save(user);

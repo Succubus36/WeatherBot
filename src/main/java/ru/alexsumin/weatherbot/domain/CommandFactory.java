@@ -10,10 +10,9 @@ import ru.alexsumin.weatherbot.service.WeatherService;
 @Component
 public class CommandFactory {
 
-
-    private UserService userService;
-    private SubscriptionService subscriptionService;
-    private WeatherService weatherService;
+    private final UserService userService;
+    private final SubscriptionService subscriptionService;
+    private final WeatherService weatherService;
 
     public CommandFactory(UserService userService, SubscriptionService subscriptionService,
                           WeatherService weatherService) {
@@ -27,6 +26,8 @@ public class CommandFactory {
         CurrentMenu menu = user.getCurrentMenu();
 
         switch (menu) {
+            case START:
+                return new StartCommand(message, userService);
             case START_CITY:
                 return new StartCityCommand(message, userService, subscriptionService, weatherService);
             case START_NOTIFICATIONS:
@@ -40,7 +41,8 @@ public class CommandFactory {
             case CHANGE_CITY:
                 return new ChangeCityCommand(message, userService, subscriptionService, weatherService);
             default:
-                return new StartCommand(message, userService);
+                throw new IllegalArgumentException("Wrong current menu");
+
         }
     }
 }

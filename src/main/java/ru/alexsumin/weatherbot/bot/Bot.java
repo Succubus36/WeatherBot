@@ -1,5 +1,6 @@
 package ru.alexsumin.weatherbot.bot;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
@@ -15,6 +16,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Slf4j
 @Component
 public class Bot extends TelegramLongPollingBot {
 
@@ -39,6 +41,7 @@ public class Bot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             Message message = update.getMessage();
+            log.info("Received message: " + message.getText() + " from user: " + message.getChatId());
             Command command = commandFactory.getCommand(message);
 
             CompletableFuture.supplyAsync(() -> {
@@ -50,7 +53,7 @@ public class Bot extends TelegramLongPollingBot {
             }, executorService)
                     .thenAcceptAsync(this::sendResponse, executorService)
                     .exceptionally(throwable -> {
-                        System.out.println(throwable.getMessage());
+                        log.error(throwable.getMessage());
                         return null;
                     });
         }
@@ -60,8 +63,10 @@ public class Bot extends TelegramLongPollingBot {
     public synchronized void sendResponse(SendMessage response) {
         try {
             execute(response);
+            log.info("Sent message: \"" + response.getText()
+                        + "\" to user: " + response.getChatId());
         } catch (TelegramApiException e) {
-            e.printStackTrace();
+            log.error("Couldn't send message: " + e.getMessage());
         }
     }
 

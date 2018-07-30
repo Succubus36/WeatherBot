@@ -1,5 +1,6 @@
 package ru.alexsumin.weatherbot.commands;
 
+import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
 import ru.alexsumin.weatherbot.domain.CurrentMenu;
@@ -12,7 +13,7 @@ import ru.alexsumin.weatherbot.service.UserService;
 import ru.alexsumin.weatherbot.service.WeatherService;
 
 import java.util.Date;
-
+@Slf4j
 public class ChangeCityCommand extends Command {
 
     private static final String UNKNOWN_CITY = "Не удалось определить город, попробуй ещё раз";
@@ -79,6 +80,7 @@ public class ChangeCityCommand extends Command {
                             .build();
                 }
                 catch (Exception e){
+                    log.error(e.getMessage());
                     return new SendMessage(chatId, UNKNOWN_CITY);
                 }
             }

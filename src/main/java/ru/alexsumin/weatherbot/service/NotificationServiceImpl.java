@@ -1,5 +1,6 @@
 package ru.alexsumin.weatherbot.service;
 
+import lombok.extern.slf4j.Slf4j;
 import net.aksingh.owmjapis.model.param.WeatherData;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,6 +17,7 @@ import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.*;
 
+@Slf4j
 @Service
 public class NotificationServiceImpl implements NotificationService {
 
@@ -44,9 +46,9 @@ public class NotificationServiceImpl implements NotificationService {
 
     @TransactionalEventListener
     private void cancelNotification(CancelNotificationEvent event) {
-        System.out.println("отменить нотификацию");
-        Long keyForCancel = event.getChatId();
-        if (scheduledTasks.containsKey(keyForCancel)) {
+        Long idForCancel = event.getChatId();
+        log.info("Cancel notification event for id: " + idForCancel);
+        if (scheduledTasks.containsKey(idForCancel)) {
             ScheduledFuture<?> forCancel = scheduledTasks.remove(event.getChatId());
             forCancel.cancel(true);
         }
@@ -61,6 +63,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     public void createNotification(Long chatId, NotificationMessage notification, long delay) {
+        log.info("Create notification for user id: " + chatId);
         scheduledTasks.remove(chatId);
         Runnable notificationTask = () -> {
             SendMessage message = new SendMessage(chatId, notification.getMessage());
@@ -70,10 +73,9 @@ public class NotificationServiceImpl implements NotificationService {
         scheduledTasks.put(chatId, scheduledFuture);
     }
 
-    //@Scheduled(cron = "0 0 * * * *")
-    @Scheduled(cron = "0 0/4 * * * *")
+    @Scheduled(cron = "0 0  * * * *")
     public void everyHoursForecastCheck() {
-        System.out.println("every hour task!!!");
+        log.info("Every hour task. Checking forecast");
         activeSubscriptions = subscriptionService.getActiveSubscriptions();
         activeSubscriptions.forEach(subscription -> {
 
@@ -92,9 +94,9 @@ public class NotificationServiceImpl implements NotificationService {
 
                     Long userForNotificate = subscription.getUser().getId();
                     WeatherStatus st = WeatherStatus.getStatus(wd.getWeatherList().get(0).getMainInfo());
-                    Long time = wd.getDateTime().getTime() - lastupdated - timeToAlert;
+                    Long delay = wd.getDateTime().getTime() - lastupdated - timeToAlert;
 
-                    createNotification(userForNotificate, new NotificationMessage(st, subscription.getTimeToAlert()), time);
+                    createNotification(userForNotificate, new NotificationMessage(st, subscription.getTimeToAlert()), delay);
 
                     subscription.setTimestamp(wd.getDateTime().getTime());
                     subscription.setWeatherStatus(st);

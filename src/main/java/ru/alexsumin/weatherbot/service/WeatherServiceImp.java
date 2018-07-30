@@ -1,5 +1,6 @@
 package ru.alexsumin.weatherbot.service;
 
+import lombok.extern.slf4j.Slf4j;
 import net.aksingh.owmjapis.api.APIException;
 import net.aksingh.owmjapis.core.OWM;
 import net.aksingh.owmjapis.model.CurrentWeather;
@@ -14,13 +15,11 @@ import ru.alexsumin.weatherbot.domain.WeatherStatus;
 import ru.alexsumin.weatherbot.domain.entity.Subscription;
 
 import javax.annotation.PostConstruct;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
+@Slf4j
 @Service
 public class WeatherServiceImp implements WeatherService {
-
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
     private final SubscriptionService subscriptionService;
 
@@ -34,20 +33,19 @@ public class WeatherServiceImp implements WeatherService {
     @Value("${weathermap.api.key}")
     private String key;
 
-
     @PostConstruct
     private void init() {
+        log.info("Initializing weather service");
         updateCities();
         updateForecast();
     }
 
     private void updateCities() {
-        System.out.println("обновляю список городов");
+        log.info("Updating cities list");
         cities = new HashSet<>();
         List<Subscription> subscriptions = subscriptionService.getActiveSubscriptions();
         if (!subscriptions.isEmpty()) {
             subscriptions.forEach(subscription -> {
-                System.out.println("добавил город: " + subscription.getCity());
                 cities.add(subscription.getCity());
             });
         }
@@ -55,8 +53,7 @@ public class WeatherServiceImp implements WeatherService {
 
     @TransactionalEventListener
     private void addNewCity(NewCityEvent event) {
-        System.out.println("new city event!!");
-        System.out.println(event.getCity());
+        log.info("Add new city: " + event.getCity());
         String newCity = event.getCity();
         if (!cities.contains(newCity)) {
             updateCities();
@@ -79,25 +76,24 @@ public class WeatherServiceImp implements WeatherService {
         Map<String, List<WeatherData>> forecastTemp = new HashMap<>();
         boolean isSuccessUpdate = true;
         if (!cities.isEmpty()) {
-            for (String s : cities) {
+            for (String city : cities) {
                 try {
-                    HourlyWeatherForecast forecast = owm.hourlyWeatherForecastByCityName(s);
-                    forecastTemp.put(s, forecast.getDataList());
+                    HourlyWeatherForecast forecast = owm.hourlyWeatherForecastByCityName(city);
+                    forecastTemp.put(city, forecast.getDataList());
                 } catch (APIException e) {
-                    e.printStackTrace();
+                    log.error("Couldn't update forecast");
+                    log.error(e.getMessage());
                     isSuccessUpdate = false;
-                    System.out.println("проблема с обновлением");
                 }
             }
         }
         if (isSuccessUpdate) forecasts = forecastTemp;
-        System.out.println("обновил прогноз!");
+        log.info("Forecast was updated");
     }
 
     @Scheduled(cron = "0 1 0/3 * * *")
     public void everyThreeHoursUpdate() {
-        System.out.println(dateFormat.format(new Date(System.currentTimeMillis())));
-        System.out.println("every 3 hours task!!!");
+        log.info("Every three hours task: updating forecasts");
         updateForecast();
     }
 }

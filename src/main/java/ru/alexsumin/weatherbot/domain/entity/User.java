@@ -1,16 +1,20 @@
 package ru.alexsumin.weatherbot.domain.entity;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import ru.alexsumin.weatherbot.domain.CurrentMenu;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-
+@Data
+@ToString(exclude = "subscription")
+@EqualsAndHashCode(exclude = "subscription")
 @Entity
 @Table(name = "user")
 public class User {
 
     @Id
-    @NotNull
     @Column(name = "user_id")
     private Long id;
 
@@ -25,33 +29,8 @@ public class User {
     public User() {
     }
 
-    public User(@NotNull Long id) {
+    public User(Long id) {
         this.id = id;
         this.currentMenu = CurrentMenu.START;
     }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Subscription getSubscription() {
-        return subscription;
-    }
-
-    public void setSubscription(Subscription subscription) {
-        this.subscription = subscription;
-    }
-
-    public CurrentMenu getCurrentMenu() {
-        return currentMenu;
-    }
-
-    public void setCurrentMenu(CurrentMenu currentMenu) {
-        this.currentMenu = currentMenu;
-    }
-
 }

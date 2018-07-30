@@ -1,5 +1,6 @@
 package ru.alexsumin.weatherbot.commands;
 
+import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
 import ru.alexsumin.weatherbot.domain.CurrentMenu;
@@ -11,6 +12,7 @@ import ru.alexsumin.weatherbot.service.UserService;
 import ru.alexsumin.weatherbot.service.WeatherService;
 import ru.alexsumin.weatherbot.util.NumberUtil;
 
+@Slf4j
 public class MenuCommand extends Command {
 
     private static final String INFO = "Я - телеграм-бот, который отправляет оповещения об изменениях погоды в твоём городе. " +
@@ -49,7 +51,7 @@ public class MenuCommand extends Command {
                             .append(" ").append(WeatherStatus.getTranslatedOnRuWeather(status));
                     return new SendMessage(chatId, answer.toString());
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage());
                     return new SendMessage(chatId, "Не удалось узнать погоду, попробуй попозже ещё раз.");
                 }
             }
@@ -57,7 +59,7 @@ public class MenuCommand extends Command {
                 user.setCurrentMenu(CurrentMenu.NOTIFICATIONS);
                 userService.save(user);
                 Subscription sub = user.getSubscription();
-                boolean isActive = user.getSubscription().getActive();
+                boolean isActive = user.getSubscription().getIsActive();
                 int hours = sub.getTimeToAlert();
                 String msg;
                 if (isActive) {
