@@ -31,14 +31,16 @@
 ### Тестирование
 Для запуска тестов следует использовать команду `mvn verify`
 
-### Скриншоты
-<img src="https://github.com/alexsumin/weatherbot/raw/master/screenshots/1.jpg" alt="alt text" width="400" height="711">
-<img src="https://github.com/alexsumin/weatherbot/raw/master/screenshots/2.jpg" alt="alt text" width="400" height="711">
-<img src="https://github.com/alexsumin/weatherbot/raw/master/screenshots/3.jpg" alt="alt text" width="400" height="711">
-<img src="https://github.com/alexsumin/weatherbot/raw/master/screenshots/4.jpg" alt="alt text" width="400" height="711">
-
 ### Планы по улучшению
 * Использовать key-value хранилище для сохранения текущего прогноза и места в меню;
 * Добавить возможность подписки на изменения погоды в нескольких городах;
 * Добавить возможность установить время для оповещений(не оповещать ночью, например);
 * Добавить больше состояний погоды(в данный момент их 7);
+* Улучшить покрытие тестами;
+
+### Скриншоты
+<img src="https://github.com/alexsumin/weatherbot/raw/master/screenshots/1.jpg" alt="alt text" width="350" height="622">
+<img src="https://github.com/alexsumin/weatherbot/raw/master/screenshots/2.jpg" alt="alt text" width="350" height="622">
+<img src="https://github.com/alexsumin/weatherbot/raw/master/screenshots/3.jpg" alt="alt text" width="350" height="622">
+<img src="https://github.com/alexsumin/weatherbot/raw/master/screenshots/4.jpg" alt="alt text" width="350" height="622">
+
