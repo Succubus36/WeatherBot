@@ -32,7 +32,8 @@
 Для запуска тестов следует использовать команду `mvn verify`
 
 ### Скриншоты
-[bot](https://github.com/alexsumin/weatherbot/raw/master/screenshots/1.jpg)
-[bot](https://github.com/alexsumin/weatherbot/raw/master/screenshots/2.jpg)
-[bot](https://github.com/alexsumin/weatherbot/raw/master/screenshots/3.jpg)
-[bot](https://github.com/alexsumin/weatherbot/raw/master/screenshots/4.jpg)
+
+![bot](https://github.com/alexsumin/weatherbot/raw/master/screenshots/1.jpg)
+![bot](https://github.com/alexsumin/weatherbot/raw/master/screenshots/2.jpg)
+![bot](https://github.com/alexsumin/weatherbot/raw/master/screenshots/3.jpg)
+![bot](https://github.com/alexsumin/weatherbot/raw/master/screenshots/4.jpg)
