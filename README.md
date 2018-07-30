@@ -25,7 +25,7 @@
 4. Теперь выполнить команду 
 `mvn clean install` 
 и затем команду 
-`java -jar weatherbot-0.0.1-SNAPSHOT.jar` для запуска4
+`java -jar weatherbot-0.0.1-SNAPSHOT.jar` для запуска;
 
 
 ### Тестирование
