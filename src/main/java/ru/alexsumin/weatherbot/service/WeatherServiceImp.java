@@ -56,6 +56,7 @@ public class WeatherServiceImp implements WeatherService {
     @TransactionalEventListener
     private void addNewCity(NewCityEvent event) {
         System.out.println("new city event!!");
+        System.out.println(event.getCity());
         String newCity = event.getCity();
         if (!cities.contains(newCity)) {
             updateCities();

@@ -1,13 +1,13 @@
 package ru.alexsumin.weatherbot.commands;
 
 import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.Message;
 import ru.alexsumin.weatherbot.domain.CurrentMenu;
+import ru.alexsumin.weatherbot.domain.ReplyKeyboardBuilder;
 import ru.alexsumin.weatherbot.domain.entity.Subscription;
 import ru.alexsumin.weatherbot.domain.entity.User;
-import ru.alexsumin.weatherbot.domain.ReplyKeyboardBuilder;
 import ru.alexsumin.weatherbot.service.SubscriptionService;
 import ru.alexsumin.weatherbot.service.UserService;
-import org.telegram.telegrambots.api.objects.Message;
 import ru.alexsumin.weatherbot.util.NumberUtil;
 
 public class NotificationCommand extends Command {
@@ -46,7 +46,7 @@ public class NotificationCommand extends Command {
                         .endRow()
                         .build();
             }
-            case "Не хочу": {
+            case "Не присылать": {
                 Subscription subscription = user.getSubscription();
                 subscription.setActive(false);
                 user.setCurrentMenu(CurrentMenu.MENU);

@@ -9,17 +9,18 @@ import ru.alexsumin.weatherbot.domain.entity.Subscription;
 import ru.alexsumin.weatherbot.domain.entity.User;
 import ru.alexsumin.weatherbot.service.UserService;
 import ru.alexsumin.weatherbot.service.WeatherService;
+import ru.alexsumin.weatherbot.util.NumberUtil;
 
 public class MenuCommand extends Command {
 
-    private static final String INFO = "Я бот, который любезно отправляет оповещения об изменениях погоды в твоём городе. " +
+    private static final String INFO = "Я - телеграм-бот, который отправляет оповещения об изменениях погоды в твоём городе. " +
             "Иногда это может быть весьма полезно. Например, со мной дождь уже не застанет тебя врасплох. " +
-            "\nЕсли у тебя есть трудности с добавлением своего города, попробуй написать на английском, " +
+            "\nЕсли у тебя есть трудности с добавлением своего города, попробуй написать на английском " +
             "с указанием страны, например: London, Uk." +
             "\nЯ только в начале своего жизненного пути и, если ты хочешь помочь мне в развитии, пиши моему " +
             "создателю @nimus все пожелания и предложения.";
-    private static final String NOTIFICATIONS = "Хочешь, чтобы я сам присылал тебе сообщения об изменении погоды?" +
-            "Напиши за сколько часов тебя предупредить(от 1 до 24)";
+    private static final String NOTIFICATIONS = "\nЕсли хочешь это изменить, то " +
+            "напиши за сколько часов тебя предупредить(от 1 до 24)";
 
 
     private final Message message;
@@ -49,17 +50,28 @@ public class MenuCommand extends Command {
                     return new SendMessage(chatId, answer.toString());
                 } catch (Exception e) {
                     e.printStackTrace();
-                    return new SendMessage(chatId, "Не удалось узнать погоду, попробуй попозже ещё разик");
+                    return new SendMessage(chatId, "Не удалось узнать погоду, попробуй попозже ещё раз.");
                 }
             }
             case "Уведомления": {
                 user.setCurrentMenu(CurrentMenu.NOTIFICATIONS);
                 userService.save(user);
+                Subscription sub = user.getSubscription();
+                boolean isActive = user.getSubscription().getActive();
+                int hours = sub.getTimeToAlert();
+                String msg;
+                if (isActive) {
+                    msg = "Сейчас я присылаю оповещения за " + hours + " " +
+                            NumberUtil.getFormattedHours(hours) + "." + NOTIFICATIONS;
+                } else {
+                    msg = "Сейчас оповещения отключены. " + NOTIFICATIONS;
+                }
+
                 return ReplyKeyboardBuilder.create(chatId)
-                        .setText(NOTIFICATIONS)
+                        .setText(msg)
                         .row()
                         .button("Назад")
-                        .button("Не хочу")
+                        .button("Не присылать")
                         .endRow()
                         .build();
             }
@@ -69,7 +81,7 @@ public class MenuCommand extends Command {
                 user.setCurrentMenu(CurrentMenu.SETTINGS);
                 userService.save(user);
                 return ReplyKeyboardBuilder.create(chatId)
-                        .setText("Ты подписан на обновления в городе: " + city + ".")
+                        .setText("Твой город: " + city + ".")
                         .row()
                         .button("Изменить")
                         .button("Назад")

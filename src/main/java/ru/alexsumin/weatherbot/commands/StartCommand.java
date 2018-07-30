@@ -8,7 +8,9 @@ import ru.alexsumin.weatherbot.service.UserService;
 
 public class StartCommand extends Command{
 
-    private static final String HELLO = "Привет! Красивое приветствие." +
+    private static final String HELLO = "Привет! Я телеграм-бот, который создан специально для того, чтобы " +
+            "оповещать тебя об изменениях погоды." +
+            "\nНадеюсь, со мной твоя жизнь станет чуточку легче и веселее :)\n" +
             "А сейчас небольшое интервью.\n" +
             "Впиши свой город:";
 

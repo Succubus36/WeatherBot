@@ -1,10 +1,10 @@
 package ru.alexsumin.weatherbot.commands;
 
-import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.Message;
 import ru.alexsumin.weatherbot.domain.CurrentMenu;
-import ru.alexsumin.weatherbot.domain.entity.User;
 import ru.alexsumin.weatherbot.domain.ReplyKeyboardBuilder;
+import ru.alexsumin.weatherbot.domain.entity.User;
 import ru.alexsumin.weatherbot.service.UserService;
 
 public class SettingsCommand extends Command {
@@ -27,8 +27,8 @@ public class SettingsCommand extends Command {
                 user.setCurrentMenu(CurrentMenu.CHANGE_CITY);
                 userService.save(user);
                 return ReplyKeyboardBuilder.create(chatId)
-                        .setText("Пришли название города, чтобы я смог присылать тебе оповещения " +
-                                "о изменении погоды в нем")
+                        .setText("Напиши название города, чтобы я смог присылать тебе оповещения " +
+                                "об изменении погоды в нём.")
                         .row()
                         .button("Назад")
                         .endRow()
