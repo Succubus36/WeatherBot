@@ -41,7 +41,7 @@ public class CommandFactory {
             case CHANGE_CITY:
                 return new ChangeCityCommand(message, userService, subscriptionService, weatherService);
             default:
-                throw new IllegalArgumentException("Wrong current menu");
+                throw new IllegalArgumentException("Wrong current menu: " + menu);
 
         }
     }

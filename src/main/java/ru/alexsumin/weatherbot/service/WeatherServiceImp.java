@@ -45,9 +45,7 @@ public class WeatherServiceImp implements WeatherService {
         cities = new HashSet<>();
         List<Subscription> subscriptions = subscriptionService.getActiveSubscriptions();
         if (!subscriptions.isEmpty()) {
-            subscriptions.forEach(subscription -> {
-                cities.add(subscription.getCity());
-            });
+            subscriptions.forEach(subscription -> cities.add(subscription.getCity()));
         }
     }
 
@@ -74,25 +72,23 @@ public class WeatherServiceImp implements WeatherService {
     private void updateForecast() {
         OWM owm = new OWM(key);
         Map<String, List<WeatherData>> forecastTemp = new HashMap<>();
-        boolean isSuccessUpdate = true;
         if (!cities.isEmpty()) {
             for (String city : cities) {
                 try {
                     HourlyWeatherForecast forecast = owm.hourlyWeatherForecastByCityName(city);
                     forecastTemp.put(city, forecast.getDataList());
                 } catch (APIException e) {
-                    log.error("Couldn't update forecast");
-                    log.error(e.getMessage());
-                    isSuccessUpdate = false;
+                    log.error("Couldn't update forecast " + e.getMessage());
+                    return;
                 }
             }
         }
-        if (isSuccessUpdate) forecasts = forecastTemp;
+        forecasts = forecastTemp;
         log.info("Forecast was updated");
     }
 
     @Scheduled(cron = "0 1 0/3 * * *")
-    public void everyThreeHoursUpdate() {
+    private void everyThreeHoursUpdate() {
         log.info("Every three hours task: updating forecasts");
         updateForecast();
     }

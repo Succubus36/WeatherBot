@@ -2,6 +2,9 @@ package ru.alexsumin.weatherbot.util;
 
 public class NumberUtil {
 
+    private NumberUtil() {
+    }
+
     public static boolean isInTheRangeFromOneToTwentyFour(int hours) {
         return (((hours > 0) & (hours <= 24)));
     }

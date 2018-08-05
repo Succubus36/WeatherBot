@@ -2,7 +2,6 @@ package ru.alexsumin.weatherbot.service;
 
 import lombok.extern.slf4j.Slf4j;
 import net.aksingh.owmjapis.model.param.WeatherData;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -14,7 +13,11 @@ import ru.alexsumin.weatherbot.domain.WeatherStatus;
 import ru.alexsumin.weatherbot.domain.entity.Subscription;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import javax.annotation.PreDestroy;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.*;
 
 @Slf4j
@@ -42,7 +45,6 @@ public class NotificationServiceImpl implements NotificationService {
         scheduledTasks = new ConcurrentHashMap<>();
         execService = Executors.newSingleThreadScheduledExecutor();
     }
-
 
     @TransactionalEventListener
     private void cancelNotification(CancelNotificationEvent event) {
@@ -74,29 +76,29 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Scheduled(cron = "0 0  * * * *")
-    public void everyHoursForecastCheck() {
+    public void everyHourForecastCheck() {
         log.info("Every hour task. Checking forecast");
         activeSubscriptions = subscriptionService.getActiveSubscriptions();
         activeSubscriptions.forEach(subscription -> {
 
             String city = subscription.getCity();
-            long lastupdated = subscription.getTimestamp();
+            long lastUpdated = subscription.getTimestamp();
             long timeToAlert = subscription.getTimeToAlert() * 60 * 60 * 1000;
             WeatherStatus status = subscription.getWeatherStatus();
             List<WeatherData> forecast = weatherService.getForecastByCity(city);
 
             for (WeatherData wd : forecast) {
 
-                if (wd.getDateTime().getTime() < lastupdated + timeToAlert)
+                if (wd.getDateTime().getTime() < lastUpdated + timeToAlert)
                     continue;
 
                 if (!status.equals(WeatherStatus.getStatus(wd.getWeatherList().get(0).getMainInfo()))) {
 
-                    Long userForNotificate = subscription.getUser().getId();
+                    Long idUserForNotification = subscription.getUser().getId();
                     WeatherStatus st = WeatherStatus.getStatus(wd.getWeatherList().get(0).getMainInfo());
-                    Long delay = wd.getDateTime().getTime() - lastupdated - timeToAlert;
+                    Long delay = wd.getDateTime().getTime() - lastUpdated - timeToAlert;
 
-                    createNotification(userForNotificate, new NotificationMessage(st, subscription.getTimeToAlert()), delay);
+                    createNotification(idUserForNotification, new NotificationMessage(st, subscription.getTimeToAlert()), delay);
 
                     subscription.setTimestamp(wd.getDateTime().getTime());
                     subscription.setWeatherStatus(st);
@@ -105,6 +107,20 @@ public class NotificationServiceImpl implements NotificationService {
                 }
             }
         });
+    }
+
+    @PreDestroy
+    private void shutdown() {
+        try {
+            log.info("Attempt to shutdown scheduled executor");
+            execService.shutdown();
+            execService.awaitTermination(1, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            log.warn(e.getMessage());
+        } finally {
+            execService.shutdownNow();
+            log.info("Shutdown scheduled executor finished");
+        }
     }
 
 }

@@ -45,6 +45,6 @@ public enum WeatherStatus {
             case CLOUDS:
                 return "\"облачно\"";
         }
-        throw new IllegalArgumentException();
+        throw new IllegalArgumentException("Wrong weatherStatus: " + status);
     }
 }

@@ -28,5 +28,6 @@ src/main/java/ru/alexsumin/weatherbot/service/CityService.java
 src/main/java/ru/alexsumin/weatherbot/handler/MessageHandler.java
 src/main/java/ru/alexsumin/weatherbot/handler/MessageHandlerImpl.java
 src/main/java/ru/alexsumin/weatherbot/handler/
+database.mv.db
 
 ### git rm --cached --ignore-unmatch src/main/java/ru/alexsumin/weatherbot/service/CityService.java
